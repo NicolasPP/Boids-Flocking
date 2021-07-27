@@ -167,7 +167,7 @@ export class Boids
                 .div(neighbours.length)
                 .setMag(this.maxSpeed)
                 .add(this.velocity)
-                .limit(this.maxForce )
+                .limit(this.maxForce + 0.003 )
         }
         return average
     }
