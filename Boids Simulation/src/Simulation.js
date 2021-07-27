@@ -1,5 +1,7 @@
 import {Boids} from "./Boids.js"
 const boidsList = []
+const canvasHeight = 1200
+const canvasWidth = 900
 
 function generateRandomLocation(height, width)
 {
@@ -8,11 +10,11 @@ function generateRandomLocation(height, width)
     return {x, y};
 }
 
-for(let i = 0; i < 1000 ; i++)
+for(let i = 0; i < 600 ; i++)
 {
-    let location = generateRandomLocation(900,600);
+    let location = generateRandomLocation(canvasHeight,canvasWidth);
     const newBoid = new Boids(location.x , location.y);
-    newBoid.draw();
+    newBoid.drawline();
     boidsList.push(newBoid);
 }
 
@@ -20,29 +22,18 @@ function clearAll()
 {
     const canvas = document.getElementById("simulation");
     const context = canvas.getContext("2d");
-    context.clearRect(0,0,600,900)
+    context.clearRect(0,0,canvasWidth,canvasHeight)
 }
 
 function start()
 {
+    clearAll()
     for(let b of boidsList)
     {
         b.flock()
+        b.drawline();
+        b.update()
     }
-    clearAll()
-    let index = 0;
-    for(let i of boidsList)
-    {
-        i.update(index);
-        i.draw();
-        index += 1;
-    }
-    // for(let j of boidsList[0].getSurroundingBoids(100))
-    // {
-    //     console.log(j)
-    //     j.draw2()
-    // }
-    boidsList[0].clearUpdateArray()
 }
 setInterval(start,10);
 

@@ -4,7 +4,9 @@ const canvas = document.getElementById("simulation");
 const context = canvas.getContext("2d");
 let updateArray = [];
 const boidsList = [];
-const radius = 100;
+const radius = 50;
+const canvasHeight = 1200
+const canvasWidth = 900
 
 export class Boids
 {
@@ -15,8 +17,8 @@ export class Boids
         this.position = new Vector(this.x , this.y);
         this.velocity = this.randUnitVectors();
         this.acceleration  = new Vector(0,0);
-        this.maxSpeed = 2.5;
-        this.maxForce = 0.04;
+        this.maxSpeed = 3.5;
+        this.maxForce = 0.2;
         boidsList.push(this);
 
     }
@@ -24,30 +26,65 @@ export class Boids
     draw()
     {
         context.beginPath();
-        context.arc(this.position.value1, this.position.value2, 10, 0, Math.PI * 2);
+        context.arc(this.position.value1, this.position.value2, 5, 0, Math.PI * 2);
         context.fillStyle = "#0095DD";
         context.fill();
         context.closePath();
     }
 
 
+    drawline()
+    {
+        const arrowSize = 20
+        let val = this.position.value1 + arrowSize * this.velocity.unit().value1
+        let val2 = this.position.value2 + arrowSize * this.velocity.unit().value2
+        context.beginPath()
+        context.moveTo(val , val2)
+        context.lineTo(this.position.value1, this.position.value2 )
+        context.stroke()
+        context.closePath()
+    }
+
+
+
     goThroughWall()
     {
         if(this.position.value1 < 0)
         {
-            this.position.value1 = 600;
+            this.position.value1 = canvasWidth;
         }
-        if(this.position.value1 > 600)
+        if(this.position.value1 > canvasWidth)
         {
             this.position.value1 = 0;
         }
         if(this.position.value2 < 0)
         {
-            this.position.value2 = 900;
+            this.position.value2 = canvasHeight;
         }
-        if(this.position.value2 > 900)
+        if(this.position.value2 > canvasHeight)
         {
             this.position.value2 = 0;
+        }
+    }
+
+
+    bounceOnThroughWall()
+    {
+        if(this.position.value1 < 0)
+        {
+            this.velocity = this.velocity.multiply(-1)
+        }
+        if(this.position.value1 > canvasWidth)
+        {
+            this.velocity = this.velocity.multiply(-1)
+        }
+        if(this.position.value2 < 0)
+        {
+            this.velocity = this.velocity.multiply(-1)
+        }
+        if(this.position.value2 > canvasHeight)
+        {
+            this.velocity = this.velocity.multiply(-1)
         }
     }
 
@@ -67,7 +104,7 @@ export class Boids
         for(let b of boidsList)
         {
             let distance = this.position.dist(b.position);
-            if (distance <= radius && b !== this)
+            if (radius >= distance && b !== this)
             {
                 subFlock.push(b);
             }
@@ -86,9 +123,9 @@ export class Boids
         if (neighbours.length > 0)
         {
             average = average.div(neighbours.length)
-            average = average.setMag(this.maxSpeed)
-            average = average.subtract(this.velocity)
-            average = average.limit(this.maxForce)
+                .setMag(this.maxSpeed)
+                .subtract(this.velocity)
+                .limit(this.maxForce)
         }
         return average
 
@@ -105,10 +142,10 @@ export class Boids
         if(neighbours.length > 0)
         {
             average = average.div(neighbours.length)
-            average = average.subtract(this.position)
-            average = average.setMag(this.maxSpeed)
-            average = average.subtract(this.velocity)
-            average = average.limit(this.maxForce)
+                .subtract(this.position)
+                .setMag(this.maxSpeed)
+                .subtract(this.velocity)
+                .limit(this.maxForce)
         }
         return average
     }
@@ -126,62 +163,36 @@ export class Boids
         }
         if(neighbours.length > 0)
         {
-            average = average.div(neighbours.length)
-            average = average.subtract(this.position)
-            average = average.setMag(this.maxSpeed)
-            average = average.subtract(this.velocity)
-            average = average.limit(this.maxForce)
+            average = average
+                .div(neighbours.length)
+                .setMag(this.maxSpeed)
+                .add(this.velocity)
+                .limit(this.maxForce )
         }
         return average
     }
 
     flock()
     {
-        // this.acceleration = this.cohesion()
-        // this.acceleration = this.acceleration.add(this.alignment())
-        // this.acceleration = this.acceleration.add(this.repulsion())
         let cohesion = this.cohesion()
         let repulsion = this.repulsion()
         let alignment = this.alignment()
-        // this.applyForce(alignment)
-        // this.applyForce(cohesion)
+        this.applyForce(alignment)
+        this.applyForce(cohesion)
         this.applyForce(repulsion)
-        // updateArray.push(alignment)
-        // updateArray.push([cohesion,repulsion,alignment])
-        // console.log(updateArray)
     }
 
-    clearUpdateArray()
+    update()
     {
-        // console.log("amen")
-        for(let i of updateArray)
-        {
-            updateArray.pop()
-        }
-    }
-
-
-    update(index)
-    {
-        // let cohesion = updateArray[index][0];
-        // let repulsion = updateArray[index][1];
-        // this.acceleration = updateArray[index][2];
-        // this.acceleration = this.acceleration.add(repulsion);
-        // this.acceleration = this.acceleration.add(cohesion);
-        // console.log((updateArray)[index])
-        // this.applyForce(updateArray[index])
-        // this.velocity = this.velocity.setMag(this.maxSpeed);
-        // this.acceleration = this.acceleration.limit(this.maxForce)
         this.velocity = this.velocity.add(this.acceleration);
         this.position = this.position.add(this.velocity);
-        this.goThroughWall();
+        this.goThroughWall()
         this.acceleration = this.acceleration.multiply(0)
-        // this.acceleration = this.acceleration.multiply(0);
+
     }
 
     applyForce(force)
     {
-        // this.acceleration = this.acceleration.limit(this.maxForce)
         return this.acceleration = this.acceleration.add(force)
     }
 }

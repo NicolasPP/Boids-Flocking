@@ -69,6 +69,13 @@ export class Vector
         return result
     }
 
+    getPerpen()
+    {
+        let guessY = 1;
+        let guessX = -guessY * this.value2/this.value1
+        return new Vector(guessX, guessY).unit();
+    }
+
     magSq()
     {
         return (this.value1 * this.value1) + (this.value2 * this.value2)
