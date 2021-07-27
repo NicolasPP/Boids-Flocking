@@ -1,0 +1,8 @@
+{
+  "name": "Boids Simulation",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "random-float": "^3.0.0"
+  }
+}
