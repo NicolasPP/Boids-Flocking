@@ -4,15 +4,6 @@ import {Area, QuadTree} from "./QuadTree.js";
 const boidsList = []
 const canvasHeight = window.innerHeight;
 const canvasWidth = window.innerWidth;
-// const area = new Area
-
-// (
-//     canvasWidth / 2 ,
-//     canvasHeight / 2 ,
-//     canvasHeight / 2 ,
-//     canvasWidth / 2
-// )
-// export let quadTree = new QuadTree( area , 5 )
 
 function generateRandomLocation(height, width)
 {
