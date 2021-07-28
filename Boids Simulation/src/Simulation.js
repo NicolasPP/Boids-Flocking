@@ -1,7 +1,18 @@
 import {Boids} from "./Boids.js"
+import {Area, QuadTree} from "./QuadTree.js";
+
 const boidsList = []
-const canvasHeight = 1200
-const canvasWidth = 900
+const canvasHeight = window.innerHeight;
+const canvasWidth = window.innerWidth;
+// const area = new Area
+
+// (
+//     canvasWidth / 2 ,
+//     canvasHeight / 2 ,
+//     canvasHeight / 2 ,
+//     canvasWidth / 2
+// )
+// export let quadTree = new QuadTree( area , 5 )
 
 function generateRandomLocation(height, width)
 {
@@ -10,7 +21,7 @@ function generateRandomLocation(height, width)
     return {x, y};
 }
 
-for(let i = 0; i < 600 ; i++)
+for(let i = 0; i < 1000 ; i++)
 {
     let location = generateRandomLocation(canvasHeight,canvasWidth);
     const newBoid = new Boids(location.x , location.y);
@@ -18,22 +29,37 @@ for(let i = 0; i < 600 ; i++)
     boidsList.push(newBoid);
 }
 
+
+
 function clearAll()
 {
     const canvas = document.getElementById("simulation");
     const context = canvas.getContext("2d");
     context.clearRect(0,0,canvasWidth,canvasHeight)
 }
+// console.log(quadTree)
 
 function start()
 {
     clearAll()
+    // quadTree = new QuadTree( area , 5)
     for(let b of boidsList)
     {
         b.flock()
         b.drawline();
         b.update()
     }
+    // for(let b of boidsList)
+    // {
+    //     quadTree.insert(b)
+    // }
+    //
+    // // quadTree.show()
+    // quadTree = null
 }
+
+
+
+
 setInterval(start,10);
 

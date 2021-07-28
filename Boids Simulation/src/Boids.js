@@ -1,12 +1,26 @@
 import {Vector} from "./Vector.js";
+import {Area, Circle, QuadTree} from "./QuadTree.js";
+
+
 
 const canvas = document.getElementById("simulation");
 const context = canvas.getContext("2d");
-let updateArray = [];
+const canvasHeight = window.innerHeight;
+const canvasWidth = window.innerWidth;
+canvas.width  = canvasWidth
+canvas.height = canvasHeight
 const boidsList = [];
 const radius = 50;
-const canvasHeight = 1200
-const canvasWidth = 900
+
+// const area = new Area
+// (
+//     canvasWidth / 2 ,
+//     canvasHeight / 2 ,
+//     canvasHeight / 2 ,
+//     canvasWidth / 2
+// )
+// export let quadTree = new QuadTree( area , 5 )
+
 
 export class Boids
 {
@@ -19,6 +33,9 @@ export class Boids
         this.acceleration  = new Vector(0,0);
         this.maxSpeed = 3.5;
         this.maxForce = 0.2;
+        // this.recAreaRadius = new Area(this.x - radius /2 , this.y - radius/2 ,radius  , radius )
+        // this.circle = new Circle(this.x , this.y , radius)
+
         boidsList.push(this);
 
     }
@@ -73,18 +90,23 @@ export class Boids
         if(this.position.value1 < 0)
         {
             this.velocity = this.velocity.multiply(-1)
+            this.maxForce = 2
         }
         if(this.position.value1 > canvasWidth)
         {
             this.velocity = this.velocity.multiply(-1)
+            this.maxForce = 2
         }
         if(this.position.value2 < 0)
         {
             this.velocity = this.velocity.multiply(-1)
+            this.maxForce = 2
+
         }
         if(this.position.value2 > canvasHeight)
         {
             this.velocity = this.velocity.multiply(-1)
+            this.maxForce = 2
         }
     }
 
@@ -98,9 +120,13 @@ export class Boids
         return new Vector(x, y)
     }
 
+
     getSurroundingBoids(radius)
     {
         let subFlock = [];
+        // let test = []
+        // quadTree.find(this.circle, test)
+        // console.log(test)
         for(let b of boidsList)
         {
             let distance = this.position.dist(b.position);
@@ -109,6 +135,7 @@ export class Boids
                 subFlock.push(b);
             }
         }
+        // console.log(subFlock + "  hey")
         return subFlock;
     }
 
@@ -167,7 +194,7 @@ export class Boids
                 .div(neighbours.length)
                 .setMag(this.maxSpeed)
                 .add(this.velocity)
-                .limit(this.maxForce + 0.003 )
+                .limit(this.maxForce + 0.002 )
         }
         return average
     }
@@ -188,6 +215,7 @@ export class Boids
         this.position = this.position.add(this.velocity);
         this.goThroughWall()
         this.acceleration = this.acceleration.multiply(0)
+        this.maxForce =0.2
 
     }
 
@@ -195,6 +223,7 @@ export class Boids
     {
         return this.acceleration = this.acceleration.add(force)
     }
+
 }
 
 
