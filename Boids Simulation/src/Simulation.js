@@ -62,7 +62,6 @@ function start()
 
     for (let i of subflock)
     {
-        console.log("yo")
         i.drawline()
     }
     qT.show()
