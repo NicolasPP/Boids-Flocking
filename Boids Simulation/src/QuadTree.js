@@ -9,7 +9,7 @@ export class QuadTree
         this.capacity = capacity;
         this.boidsList = [];
         this.split = false;
-        this.bad = []
+        this.subTrees = []
     }
 
 
@@ -24,6 +24,7 @@ export class QuadTree
 
         );
         this.topLeft = new QuadTree( tl , this.capacity ); //northwest
+        this.subTrees.push(this.topLeft)
 
         let tr = new Area
         (
@@ -34,6 +35,7 @@ export class QuadTree
 
         );
         this.topRight = new QuadTree( tr , this.capacity );// northeast
+        this.subTrees.push(this.topRight)
 
         let bl = new Area
         (
@@ -43,6 +45,7 @@ export class QuadTree
             this.area.w/2
         );
         this.bottomLeft = new QuadTree( bl , this.capacity );//southwest
+        this.subTrees.push(this.bottomLeft)
 
         let br = new Area
         (
@@ -52,12 +55,15 @@ export class QuadTree
             this.area.w/2
         );
         this.bottomRight = new QuadTree( br , this.capacity );//southeast
+        this.subTrees.push(this.bottomRight)
+
+
         this.split = true;
     }
 
     show()
     {
-        console.log("here")
+        // console.log("here")
         context.beginPath()
         context.moveTo(this.area.x, this.area.y)
         context.lineTo(this.area.x + this.area.w, this.area.y)
@@ -79,27 +85,50 @@ export class QuadTree
         }
     }
 
+
+    getBoidsNum()
+    {
+        if (!this.split)
+        {
+            return this.boidsList.length
+        }
+        else
+        {
+            this.topLeft.getBoidsNum()
+            this.topRight.getBoidsNum()
+            this.bottomRight.getBoidsNum()
+            this.bottomLeft.getBoidsNum()
+        }
+
+    }
+
     find(range, subFlock)
     {
         if (!subFlock)
         {
+            console.log("there")
             subFlock = []
         }
-        if (!this.area.overlaps(range))
+        if (!this.area.overlap(range))
         {
+            console.log("here")
             return subFlock;
         }
         else
         {
+            console.log("oi")
             for (let b of this.boidsList)
             {
-                if (range.contains(b))
+                if (range.have(b))
                 {
+                    console.log("oi2")
                     subFlock.push(b)
+
                 }
             }
             if (this.split)
             {
+                console.log("over here")
                 this.topRight.find(range, subFlock);
                 this.topLeft.find(range, subFlock);
                 this.bottomRight.find(range, subFlock);
@@ -110,26 +139,27 @@ export class QuadTree
 
     }
 
-    addList(list, list2)
+    clear()
     {
-        for(let b of list1)
+        this.boidsList = [];
+
+        for (let i = 0 ; i < this.subTrees.length ; i ++)
         {
-            list2.push(b)
+            if (this.subTrees.length)
+
+            {
+                this.subTrees[i].clear()
+            }
         }
+        this.subTrees = [];
+        this.split = false;
     }
 
-    // clear()
-    // {
-    //     for ()
-    // }
 
 
-
-    insert(boid)
-    {
+    insert(boid) {
         if (!this.area.contains(boid))
         {
-            this.bad.push(boid)
             return;
         }
         if (this.boidsList.length < this.capacity)
@@ -162,16 +192,17 @@ export class Area
 
     contains(boid)
     {
+
         return(
-            boid.x >= this.x - this.w &&
-            boid.x <= this.x + this.w &&
-            boid.y >= this.y - this.h &&
-            boid.y <= this.y + this.h
+            boid.position.value1 >= this.x - this.w &&
+            boid.position.value1 <= this.x + this.w &&
+            boid.position.value2 >= this.y - this.h &&
+            boid.position.value2 <= this.y + this.h
         );
     }
 
 
-    overlaps(range)
+    overlap(range)
     {
         return !(
             range.x - range.w > this.x + this.w ||
@@ -192,9 +223,9 @@ export class Circle
         this.rSquared = this.r * this.r;
     }
 
-    contains(boid)
+    have(boid)
     {
-        let d = Math.pow((boid.x - this.x), 2) + Math.pow((boid.y - this.y), 2);
+        let d = Math.pow((boid.position.value1 - this.x), 2) + Math.pow((boid.position.value2 - this.y), 2);
         return d <= this.rSquared;
     }
 

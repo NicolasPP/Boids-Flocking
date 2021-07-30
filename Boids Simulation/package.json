@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {},
   "devDependencies": {
+    "js-quadtree": "^3.3.6",
     "random-float": "^3.0.0"
   }
 }

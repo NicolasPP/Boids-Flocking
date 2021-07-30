@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/boids flocking.iml" filepath="$PROJECT_DIR$/.idea/boids flocking.iml" />
+      <module fileurl="file://$USER_HOME$/node_modules/js-quadtree/js-quadtree.iml" filepath="$USER_HOME$/node_modules/js-quadtree/js-quadtree.iml" />
     </modules>
   </component>
 </project>

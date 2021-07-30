@@ -1,6 +1,6 @@
 import {Vector} from "./Vector.js";
-import {Area, Circle, QuadTree} from "./QuadTree.js";
-
+import {qT} from "./Simulation.js";
+import {Circle} from "./QuadTree.js";
 
 
 const canvas = document.getElementById("simulation");
@@ -12,14 +12,6 @@ canvas.height = canvasHeight
 const boidsList = [];
 const radius = 50;
 
-// const area = new Area
-// (
-//     canvasWidth / 2 ,
-//     canvasHeight / 2 ,
-//     canvasHeight / 2 ,
-//     canvasWidth / 2
-// )
-// export let quadTree = new QuadTree( area , 5 )
 
 
 export class Boids
@@ -28,13 +20,14 @@ export class Boids
     {
         this.x = x;
         this.y = y;
-        this.position = new Vector(this.x , this.y);
-        this.velocity = this.randUnitVectors();
-        this.acceleration  = new Vector(0,0);
         this.maxSpeed = 3.5;
         this.maxForce = 0.2;
-        // this.recAreaRadius = new Area(this.x - radius /2 , this.y - radius/2 ,radius  , radius )
-        // this.circle = new Circle(this.x , this.y , radius)
+        this.position = new Vector(this.x , this.y);
+        this.velocity = this.randUnitVectors().setMag(this.maxSpeed);
+        this.acceleration  = new Vector(0,0);
+        this.circl = new Circle(this.position.value1 , this.position.value2 , radius )
+        this.subFlock  = this.getSurroundingBoids(radius)
+        // this.subFlockFast = this.getSurroundingBoidsBetter(this.circl, radius)
 
         boidsList.push(this);
 
@@ -124,9 +117,6 @@ export class Boids
     getSurroundingBoids(radius)
     {
         let subFlock = [];
-        // let test = []
-        // quadTree.find(this.circle, test)
-        // console.log(test)
         for(let b of boidsList)
         {
             let distance = this.position.dist(b.position);
@@ -135,13 +125,22 @@ export class Boids
                 subFlock.push(b);
             }
         }
-        // console.log(subFlock + "  hey")
         return subFlock;
+    }
+
+    getSurroundingBoidsBetter(radius)
+    {
+        let subFlock = []
+        let circl = new Circle(this.position.value1 , this.position.value2 , radius )
+        qT.find( circl , subFlock)
+        return subFlock
+
     }
 
     alignment()
     {
-        let neighbours = this.getSurroundingBoids(radius)
+        let neighbours = this.subFlock
+        // let neighbours = this.getSurroundingboidsBetter(radius)
         let average = new Vector(0,0)
         for (let b of neighbours)
         {
@@ -160,7 +159,9 @@ export class Boids
 
     cohesion()
     {
-        let neighbours = this.getSurroundingBoids(radius)
+        let neighbours = this.subFlock
+        // let neighbours = this.getSurroundingboidsBetter(radius)
+
         let average = new Vector(0,0)
         for(let b of neighbours)
         {
@@ -179,7 +180,8 @@ export class Boids
 
     repulsion()
     {
-        let neighbours = this.getSurroundingBoids(radius)
+        let neighbours = this.subFlock
+        // let neighbours = this.getSurroundingboidsBetter(radius)
         let average = new Vector(0,0)
         for(let b of neighbours)
         {
@@ -214,8 +216,10 @@ export class Boids
         this.velocity = this.velocity.add(this.acceleration);
         this.position = this.position.add(this.velocity);
         this.goThroughWall()
+        this.subFlock = this.getSurroundingBoids(radius)
+        // this.circl = new Circle(this.position.value1 , this.position.value2 , radius )
+        // this.subFlockFast = this.getSurroundingBoidsBetter(this.circl, radius)
         this.acceleration = this.acceleration.multiply(0)
-        this.maxForce =0.2
 
     }
 

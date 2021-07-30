@@ -1,9 +1,13 @@
 import {Boids} from "./Boids.js"
-import {Area, QuadTree} from "./QuadTree.js";
+import {QuadTree, Area, Circle} from "./QuadTree.js";
+
+const canvas = document.getElementById("simulation");
+const context = canvas.getContext("2d");
 
 const boidsList = []
 const canvasHeight = window.innerHeight;
 const canvasWidth = window.innerWidth;
+const area = new Area(canvasWidth / 2, canvasHeight / 2,canvasHeight / 2, canvasWidth / 2)
 
 function generateRandomLocation(height, width)
 {
@@ -12,15 +16,21 @@ function generateRandomLocation(height, width)
     return {x, y};
 }
 
-for(let i = 0; i < 1000 ; i++)
+export let qT = new QuadTree(area, 4)
+
+
+
+for(let i = 0; i < 100 ; i++)
 {
     let location = generateRandomLocation(canvasHeight,canvasWidth);
     const newBoid = new Boids(location.x , location.y);
-    newBoid.drawline();
+    qT.insert(newBoid)
+    newBoid.draw();
     boidsList.push(newBoid);
 }
 
 
+//measure performace canvas re -rendering
 
 function clearAll()
 {
@@ -28,28 +38,36 @@ function clearAll()
     const context = canvas.getContext("2d");
     context.clearRect(0,0,canvasWidth,canvasHeight)
 }
-// console.log(quadTree)
+
+
 
 function start()
 {
     clearAll()
-    // quadTree = new QuadTree( area , 5)
     for(let b of boidsList)
     {
+        qT.insert(b)
         b.flock()
-        b.drawline();
+        b.draw();
         b.update()
     }
-    // for(let b of boidsList)
-    // {
-    //     quadTree.insert(b)
-    // }
-    //
-    // // quadTree.show()
-    // quadTree = null
+    let subflock = []
+    let circl = new Circle(boidsList[0].position.value1 , boidsList[0].position.value2 , 50 )
+    qT.find(circl , subflock)
+
+    context.beginPath()
+    context.arc(circl.x, circl.y , 50, 0, Math.PI * 2)
+    context.stroke()
+    context.closePath()
+
+    for (let i of subflock)
+    {
+        console.log("yo")
+        i.drawline()
+    }
+    qT.show()
+    qT.clear()
 }
-
-
 
 
 setInterval(start,10);
