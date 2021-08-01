@@ -63,7 +63,6 @@ export class QuadTree
 
     show()
     {
-        // console.log("here")
         context.beginPath()
         context.moveTo(this.area.x, this.area.y)
         context.lineTo(this.area.x + this.area.w, this.area.y)
@@ -86,58 +85,40 @@ export class QuadTree
     }
 
 
-    getBoidsNum()
-    {
-        if (!this.split)
-        {
-            return this.boidsList.length
-        }
-        else
-        {
-            this.topLeft.getBoidsNum()
-            this.topRight.getBoidsNum()
-            this.bottomRight.getBoidsNum()
-            this.bottomLeft.getBoidsNum()
-        }
-
-    }
-
-    find(range, subFlock)
+    find(range, subFlock, boid  )
     {
         if (!subFlock)
         {
-            console.log("there")
             subFlock = []
         }
         if (!this.area.overlap(range))
         {
-            console.log("here")
             return subFlock;
         }
         else
         {
-            console.log("oi")
             for (let b of this.boidsList)
             {
-                if (range.have(b))
+                if (range.have(b) && boid !== b)
                 {
-                    console.log("oi2")
-                    subFlock.push(b)
-
+                    if(!this.repCheck(subFlock , boid))
+                    {
+                        subFlock.push(b)
+                    }
                 }
             }
             if (this.split)
             {
-                console.log("over here")
-                this.topRight.find(range, subFlock);
-                this.topLeft.find(range, subFlock);
-                this.bottomRight.find(range, subFlock);
-                this.bottomLeft.find(range, subFlock);
+                this.topRight.find(range, subFlock,boid );
+                this.topLeft.find(range, subFlock, boid );
+                this.bottomRight.find(range, subFlock , boid);
+                this.bottomLeft.find(range, subFlock, boid);
             }
         }
         return subFlock
 
     }
+
 
     clear()
     {
@@ -153,6 +134,22 @@ export class QuadTree
         }
         this.subTrees = [];
         this.split = false;
+    }
+
+    repCheck(list , boid)
+    {
+        if(list.length === 0)
+        {
+            return false
+        }
+        for(let i of list)
+        {
+            if(i === boid)
+            {
+                return true
+            }
+        }
+        return false
     }
 
 
@@ -229,29 +226,29 @@ export class Circle
         return d <= this.rSquared;
     }
 
-    overlaps(area)
-    {
-        let xDist = Math.abs(area.x - this.x);
-        let yDist = Math.abs(area.y - this.y);
-
-        // radius of the circle
-        let r = this.r;
-
-        let w = area.w / 2;
-        let h = area.h / 2;
-
-        let edges = Math.pow((xDist - w), 2) + Math.pow((yDist - h), 2);
-
-        // no intersection
-        if (xDist > (r + w) || yDist > (r + h))
-            return false;
-
-        // intersection within the circle
-        if (xDist <= w || yDist <= h)
-            return true;
-
-        // intersection on the edge of the circle
-        return edges <= this.rSquared;
-    }
+    // overlaps(area)
+    // {
+    //     let xDist = Math.abs(area.x - this.x);
+    //     let yDist = Math.abs(area.y - this.y);
+    //
+    //     // radius of the circle
+    //     let r = this.r;
+    //
+    //     let w = area.w / 2;
+    //     let h = area.h / 2;
+    //
+    //     let edges = Math.pow((xDist - w), 2) + Math.pow((yDist - h), 2);
+    //
+    //     // no intersection
+    //     if (xDist > (r + w) || yDist > (r + h))
+    //         return false;
+    //
+    //     // intersection within the circle
+    //     if (xDist <= w || yDist <= h)
+    //         return true;
+    //
+    //     // intersection on the edge of the circle
+    //     return edges <= this.rSquared;
+    // }
 
 }

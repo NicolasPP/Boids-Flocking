@@ -1,6 +1,4 @@
 import {Vector} from "./Vector.js";
-import {qT} from "./Simulation.js";
-import {Circle} from "./QuadTree.js";
 
 
 const canvas = document.getElementById("simulation");
@@ -10,7 +8,6 @@ const canvasWidth = window.innerWidth;
 canvas.width  = canvasWidth
 canvas.height = canvasHeight
 const boidsList = [];
-const radius = 50;
 
 
 
@@ -25,10 +22,6 @@ export class Boids
         this.position = new Vector(this.x , this.y);
         this.velocity = this.randUnitVectors().setMag(this.maxSpeed);
         this.acceleration  = new Vector(0,0);
-        this.circl = new Circle(this.position.value1 , this.position.value2 , radius )
-        this.subFlock  = this.getSurroundingBoids(radius)
-        // this.subFlockFast = this.getSurroundingBoidsBetter(this.circl, radius)
-
         boidsList.push(this);
 
     }
@@ -78,32 +71,6 @@ export class Boids
     }
 
 
-    bounceOnThroughWall()
-    {
-        if(this.position.value1 < 0)
-        {
-            this.velocity = this.velocity.multiply(-1)
-            this.maxForce = 2
-        }
-        if(this.position.value1 > canvasWidth)
-        {
-            this.velocity = this.velocity.multiply(-1)
-            this.maxForce = 2
-        }
-        if(this.position.value2 < 0)
-        {
-            this.velocity = this.velocity.multiply(-1)
-            this.maxForce = 2
-
-        }
-        if(this.position.value2 > canvasHeight)
-        {
-            this.velocity = this.velocity.multiply(-1)
-            this.maxForce = 2
-        }
-    }
-
-
     randUnitVectors()
     {
         let mag = 1;
@@ -128,27 +95,17 @@ export class Boids
         return subFlock;
     }
 
-    getSurroundingBoidsBetter(radius)
-    {
-        let subFlock = []
-        let circl = new Circle(this.position.value1 , this.position.value2 , radius )
-        qT.find( circl , subFlock)
-        return subFlock
 
-    }
-
-    alignment()
+    alignment(closeBoids)
     {
-        let neighbours = this.subFlock
-        // let neighbours = this.getSurroundingboidsBetter(radius)
         let average = new Vector(0,0)
-        for (let b of neighbours)
+        for (let b of closeBoids)
         {
             average = average.add(b.velocity)
         }
-        if (neighbours.length > 0)
+        if (closeBoids.length > 0)
         {
-            average = average.div(neighbours.length)
+            average = average.div(closeBoids.length)
                 .setMag(this.maxSpeed)
                 .subtract(this.velocity)
                 .limit(this.maxForce)
@@ -157,19 +114,16 @@ export class Boids
 
     }
 
-    cohesion()
+    cohesion(closeBoids)
     {
-        let neighbours = this.subFlock
-        // let neighbours = this.getSurroundingboidsBetter(radius)
-
         let average = new Vector(0,0)
-        for(let b of neighbours)
+        for(let b of closeBoids)
         {
             average = average.add(b.position)
         }
-        if(neighbours.length > 0)
+        if(closeBoids.length > 0)
         {
-            average = average.div(neighbours.length)
+            average = average.div(closeBoids.length)
                 .subtract(this.position)
                 .setMag(this.maxSpeed)
                 .subtract(this.velocity)
@@ -178,22 +132,20 @@ export class Boids
         return average
     }
 
-    repulsion()
+    repulsion(closeBoids)
     {
-        let neighbours = this.subFlock
-        // let neighbours = this.getSurroundingboidsBetter(radius)
         let average = new Vector(0,0)
-        for(let b of neighbours)
+        for(let b of closeBoids)
         {
             let difference = this.position.subtract(b.position)
             let distance = this.position.dist(b.position)
             let change =  difference.div(distance **2)
             average = average.add(change)
         }
-        if(neighbours.length > 0)
+        if(closeBoids.length > 0)
         {
             average = average
-                .div(neighbours.length)
+                .div(closeBoids.length)
                 .setMag(this.maxSpeed)
                 .add(this.velocity)
                 .limit(this.maxForce + 0.002 )
@@ -201,24 +153,23 @@ export class Boids
         return average
     }
 
-    flock()
+
+    flock(closeBoids)
     {
-        let cohesion = this.cohesion()
-        let repulsion = this.repulsion()
-        let alignment = this.alignment()
+        let cohesion = this.cohesion(closeBoids)
+        let repulsion = this.repulsion(closeBoids)
+        let alignment = this.alignment(closeBoids)
         this.applyForce(alignment)
         this.applyForce(cohesion)
         this.applyForce(repulsion)
     }
+
 
     update()
     {
         this.velocity = this.velocity.add(this.acceleration);
         this.position = this.position.add(this.velocity);
         this.goThroughWall()
-        this.subFlock = this.getSurroundingBoids(radius)
-        // this.circl = new Circle(this.position.value1 , this.position.value2 , radius )
-        // this.subFlockFast = this.getSurroundingBoidsBetter(this.circl, radius)
         this.acceleration = this.acceleration.multiply(0)
 
     }
@@ -227,7 +178,4 @@ export class Boids
     {
         return this.acceleration = this.acceleration.add(force)
     }
-
 }
-
-
