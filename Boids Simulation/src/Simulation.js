@@ -100,7 +100,7 @@ function start()
 
 
         //_______________________
-        // If you uncomment the code above and comment line 89
+        // If you uncomment the code above (line 95 - 98)  and comment line 93
         // youll be able to see the QuadTree find() function for the whole animation
         // this will be significantly slower
         //_______________________
@@ -113,7 +113,7 @@ function start()
     }
     // qT.show()
     //________________
-    // uncomment line 108 to see the quadTree visualisation
+    // uncomment line 114 to see the quadTree visualisation
     //________________
 
 

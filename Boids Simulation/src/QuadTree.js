@@ -225,30 +225,4 @@ export class Circle
         let d = Math.pow((boid.position.value1 - this.x), 2) + Math.pow((boid.position.value2 - this.y), 2);
         return d <= this.rSquared;
     }
-
-    // overlaps(area)
-    // {
-    //     let xDist = Math.abs(area.x - this.x);
-    //     let yDist = Math.abs(area.y - this.y);
-    //
-    //     // radius of the circle
-    //     let r = this.r;
-    //
-    //     let w = area.w / 2;
-    //     let h = area.h / 2;
-    //
-    //     let edges = Math.pow((xDist - w), 2) + Math.pow((yDist - h), 2);
-    //
-    //     // no intersection
-    //     if (xDist > (r + w) || yDist > (r + h))
-    //         return false;
-    //
-    //     // intersection within the circle
-    //     if (xDist <= w || yDist <= h)
-    //         return true;
-    //
-    //     // intersection on the edge of the circle
-    //     return edges <= this.rSquared;
-    // }
-
 }
